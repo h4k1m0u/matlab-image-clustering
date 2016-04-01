@@ -1,5 +1,5 @@
 % Read and display input image
-A = imread('../kobi.png');
+A = imread('../myanmar.png');
 Agray = rgb2gray(A);
 figure
 imshow(A)
@@ -11,7 +11,7 @@ numCols = imageSize(2);
 
 wavelengthMin = 4/sqrt(2);
 wavelengthMax = hypot(numRows,numCols);
-n = 10;%floor(log2(wavelengthMax/wavelengthMin));
+n = floor(log2(wavelengthMax/wavelengthMin));
 wavelength = 2.^(0:(n-2)) * wavelengthMin;
 
 deltaTheta = 45;
@@ -29,11 +29,12 @@ for i = 1:length(g)
 end
 
 % Map of spatial location
-X = 1:numCols;
-Y = 1:numRows;
-[X,Y] = meshgrid(X,Y);
-featureSet = cat(3,gabormag,X);
-featureSet = cat(3,featureSet,Y);
+%X = 1:numCols;
+%Y = 1:numRows;
+%[X,Y] = meshgrid(X,Y);
+%featureSet = cat(3,gabormag,X);
+%featureSet = cat(3,featureSet,Y);
+featureSet = gabormag;
 
 % 2D array to 1D vector of observations
 numPoints = numRows*numCols;
@@ -48,14 +49,14 @@ X = bsxfun(@rdivide,X,std(X));
 % L = kmeans(X,2,'Replicates',5);
 
 % gaussian mixture model
-% options = statset('MaxIter',1000);
-% gmm = fitgmdist(X, 2, 'Options', options);
-% L = cluster(gmm, X);
+options = statset('MaxIter',1000);
+gmm = fitgmdist(X, 2, 'Options', options);
+L = cluster(gmm, X);
 
 % fuzzy c-means
-[centers, U] = fcm(X, 2);
-[values indexes] = max(U);
+% [centers, U] = fcm(X, 2);
+% [values indexes] = max(U);
 
-L = reshape(indexes, [numRows numCols]);
+L = reshape(L, [numRows numCols]);
 figure
 imshow(label2rgb(L))
